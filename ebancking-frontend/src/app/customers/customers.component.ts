@@ -5,6 +5,7 @@ import { CustomerService } from '../services/customer.service';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { Customer } from '../model/customer.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
@@ -15,6 +16,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './customers.component.css',
 })
 export class CustomersComponent implements OnInit {
+  handleCustomerAccounts(customer: Customer) {
+    this.router.navigateByUrl('/customer-accounts/' + customer.id, {
+      state: customer,
+    });
+  }
+
   handleDeleteCustomer(c: Customer) {
     let conf = confirm('Are you sure?');
     if (!conf) return;
@@ -48,7 +55,8 @@ export class CustomersComponent implements OnInit {
   searchFormGroup!: FormGroup;
   constructor(
     private customerService: CustomerService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {}
   ngOnInit(): void {
     this.searchFormGroup = this.fb.group({

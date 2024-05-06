@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AccountsService } from '../services/accounts.service';
 import { AccountDetails } from '../model/account.model';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 @Component({
   selector: 'app-accounts',
   standalone: true,
@@ -19,7 +19,8 @@ export class AccountsComponent implements OnInit {
     let operationType = this.operationFormGroup.value.operationType;
     let amount: number = this.operationFormGroup.value.amount;
     let description: string = this.operationFormGroup.value.description;
-    let accountDestination: string = this.operationFormGroup.value.destination;
+    let accountDestination: string =
+      this.operationFormGroup.value.accountDestination;
     if (operationType == 'DEBIT') {
       this.accountService.debit(accountId, amount, description).subscribe({
         next: (data) => {
@@ -53,6 +54,7 @@ export class AccountsComponent implements OnInit {
           },
         });
     }
+    this.operationFormGroup.reset();
   }
   gotoPage(page: number) {
     this.currentPage = page;
@@ -60,17 +62,21 @@ export class AccountsComponent implements OnInit {
   }
   handleSearchAccount() {
     let accountId: string = this.accountFormGroup.value.accountId;
-    this.accountObservable = this.accountService.getAccount(
-      accountId,
-      this.currentPage,
-      this.pageSize
-    );
+    this.accountObservable = this.accountService
+      .getAccount(accountId, this.currentPage, this.pageSize)
+      .pipe(
+        catchError((error) => {
+          this.errorMessage = error.message;
+          return throwError(error);
+        })
+      );
   }
   accountFormGroup!: FormGroup;
   currentPage: number = 0;
   pageSize: number = 5;
   accountObservable!: Observable<AccountDetails>;
   operationFormGroup!: FormGroup;
+  errorMessage!: string;
 
   constructor(
     private fb: FormBuilder,
