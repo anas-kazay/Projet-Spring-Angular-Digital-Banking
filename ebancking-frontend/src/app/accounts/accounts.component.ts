@@ -5,6 +5,7 @@ import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AccountsService } from '../services/accounts.service';
 import { AccountDetails } from '../model/account.model';
 import { Observable, catchError, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 @Component({
   selector: 'app-accounts',
   standalone: true,
@@ -80,7 +81,8 @@ export class AccountsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private accountService: AccountsService
+    private accountService: AccountsService,
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {
